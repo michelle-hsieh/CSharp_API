@@ -1,0 +1,91 @@
+﻿@page "/fetchdata"
+
+@using System.Net.Http;
+@using System.Diagnostics;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using Radzen;
+@using Radzen.Blazor;
+@inject IJSRuntime JsRuntime;
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+}
+else
+{
+    <RadzenRadioButtonList @bind-Value=@nullableCity TValue="string" Change=@((args) => ChangeUrl(args))>
+        <Items>
+            @foreach (JObject record in forecastCity)
+            {
+                string locationName = (string)record["locationName"];
+                <RadzenRadioButtonListItem Text=@locationName Value=@locationName />
+            }
+        </Items>
+    </RadzenRadioButtonList>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>縣市</th>
+                <th>天氣</th>
+                <th>最低溫度 (°c)</th>
+                <th>最高溫度 (°c)</th>
+                <th>降雨機率 (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (JObject record in forecastCity)
+            {
+                string locationName = (string)record["locationName"]; // 地名
+                string weatherDescribe = (string)record["weatherElement"][0]["time"][0]["parameter"]["parameterName"]; // 天氣狀況
+                string pop = (string)record["weatherElement"][1]["time"][0]["parameter"]["parameterName"];  // 降雨機率
+                string minTemperature = (string)record["weatherElement"][2]["time"][0]["parameter"]["parameterName"]; // 最低溫度
+                string maxTemperature = (string)record["weatherElement"][4]["time"][0]["parameter"]["parameterName"]; // 最高溫度
+
+                @if (locationName == _selected || _selected == null)
+                {
+                    <tr>
+                        <td>@locationName</td>
+                        <td>@weatherDescribe</td>
+                        <td>@minTemperature</td>
+                        <td>@maxTemperature</td>
+                        <td>@pop</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private HttpClient httpClient = new HttpClient();
+    private string forecasts, _selected;
+    private string? nullableCity = null;
+    private string url = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-8EE9125C-1E83-4A96-9C39-1A14E6B00B92&format=JSON";
+    private JArray forecastCity;
+
+    private void ChangeUrl(string selected)
+    {
+        _selected = selected;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // get web api
+            forecasts = await httpClient.GetStringAsync(url);
+            JObject forecast = JsonConvert.DeserializeObject<JObject>(forecasts);   // 把json data deserialize為JObject
+            forecastCity = (JArray)forecast["records"]["location"]; // 回傳json陣列
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.ToString()); // error message
+        }
+    }
+}

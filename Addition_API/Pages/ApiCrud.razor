@@ -1,0 +1,21 @@
+﻿@page "/apiCrud"
+
+<h1>API Crud</h1>
+
+<RadzenRadioButtonList @bind-Value="@selectValue" TValue="int" Change="@((args) => ChooseAction(args))">
+    <Items>
+        <RadzenRadioButtonListItem Text="Create" Value="1" />
+        <RadzenRadioButtonListItem Text="Read" Value="2" />
+        <RadzenRadioButtonListItem Text="Update" Value="3" />
+        <RadzenRadioButtonListItem Text="Delete" Value="4" />
+    </Items>
+</RadzenRadioButtonList>
+
+@code {
+    private int selectValue;
+
+    private void ChooseAction(int selected)
+    {
+        selectValue = selected;
+    }
+}

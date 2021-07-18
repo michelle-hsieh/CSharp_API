@@ -1,0 +1,21 @@
+﻿@page "/addition"
+
+<h1>加法練習</h1>
+
+@*加法練習*@
+<p>
+    <RadzenNumeric TValue="int" @bind-Value=@numA /> +
+    <RadzenNumeric TValue="int" @bind-Value=@numB />
+    <RadzenButton Click="Add" Text="=" ButtonStyle="ButtonStyle.Light" />
+    @result
+</p>
+
+@code {
+    private int numA, numB, result;
+
+    @*加法練習*@
+    private void Add()
+    {
+        result = numA + numB;
+    }
+}
