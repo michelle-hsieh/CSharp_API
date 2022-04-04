@@ -13,105 +13,105 @@ namespace Addition_API.Pages
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
 #nullable restore
-#line 2 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 2 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Authorization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 3 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Authorization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 4 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 4 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Forms;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 5 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 5 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Routing;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 6 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 6 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Web;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 7 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 7 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 8 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 8 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.JSInterop;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 9 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 9 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Addition_API;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 10 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 10 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Addition_API.Shared;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 3 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using System.Net.Http;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 4 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 4 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using System.Diagnostics;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 5 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 5 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using Newtonsoft.Json;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 6 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 6 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using Newtonsoft.Json.Linq;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 7 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 7 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using Radzen;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 8 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 8 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
 using Radzen.Blazor;
 
 #line default
@@ -126,7 +126,7 @@ using Radzen.Blazor;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 65 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
+#line 65 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\FetchData.razor"
        
     private HttpClient httpClient = new HttpClient();
     private string forecasts, _selected;

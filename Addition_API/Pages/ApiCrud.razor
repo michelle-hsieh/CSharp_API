@@ -1,21 +1,223 @@
 ﻿@page "/apiCrud"
 
-<h1>API Crud</h1>
+@using System.Net.Http;
+@using Newtonsoft.Json;
+@using Radzen;
+@using Radzen.Blazor;
+@using System.Text;
+@using Addition_API.Data;
+@inject IJSRuntime JsRuntime;
 
-<RadzenRadioButtonList @bind-Value="@selectValue" TValue="int" Change="@((args) => ChooseAction(args))">
-    <Items>
-        <RadzenRadioButtonListItem Text="Create" Value="1" />
-        <RadzenRadioButtonListItem Text="Read" Value="2" />
-        <RadzenRadioButtonListItem Text="Update" Value="3" />
-        <RadzenRadioButtonListItem Text="Delete" Value="4" />
-    </Items>
-</RadzenRadioButtonList>
+<h1>API CRUD</h1>
+
+@if (depts == null && _ex == null)
+{
+    <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+}
+else if (_ex != null)
+{
+    <p>抱歉！無法取得資料</p>
+    <p>錯誤訊息：</p>
+    <p>@_ex</p>
+}
+else
+{
+    if (selectValue == 1)   // Create
+    {
+        <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @onclick=@(args => ChooseAction(0))>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <EditForm Model="@newDept">
+                        <div class="modal-body">
+                            <p class="alert-danger">@errorMsg</p>
+
+                            <label for="deptid">Department ID</label>
+                            <input type="number" id="deptid" class="form-control" @bind-value="@newDept.deptid" />
+                            <label for="dname">Department Name</label>
+                            <input type="text" id="dname" class="form-control" @bind-value="@newDept.dname" />
+
+                            <label for="location">Location</label>
+                            <input type="text" id="location" class="form-control" @bind-value="@newDept.location" />
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-info" @onclick="AddNewDept">Add Department</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
+
+    else if (selectValue == 2) // Update
+    {
+        <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @onclick=@(args => ChooseAction(0))>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <EditForm Model="@updateDept">
+                        <div class="modal-body">
+                            <label for="deptid">Department ID</label>
+                            <input type="number" id="deptid" class="form-control" @bind-value="@updateDept.deptid" disabled />
+
+                            <label for="dnme">Department Name</label>
+                            <input type="text" id="dname" class="form-control" @bind-value="@updateDept.dname" />
+
+                            <label for="location">Location</label>
+                            <input type="text" id="location" class="form-control" @bind-value="@updateDept.location" />
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-info" @onclick="UpdateDeptData">Update Department</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
+
+    <a @onclick=@(args => ChooseAction(1))><RadzenIcon Icon="note_add" />Add</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Department Id</th>
+                <th>Department Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (depts.Any())
+            {
+                @foreach (var dept in listDepts)
+                {
+                    <tr>
+                        <td>@dept.deptid</td>
+                        <td>@dept.dname</td>
+                        <td>@dept.location</td>
+                        <td>
+                            <button class="btn btn-outline-danger" @onclick="(() => DeleteDept(dept))">Delete</button>
+                            <button class="btn btn-outline-primary" @onclick="(() => SetDeptForUpdate(dept))">Update</button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td>No content.</td></tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
+    private HttpClient httpClient = new HttpClient();
+    private string depts, url, errorMsg, _ex;
     private int selectValue;
+    private List<Dept> listDepts;
+    private Dept newDept { get; set; }
+    private Dept updateDept = new Dept();
 
     private void ChooseAction(int selected)
     {
         selectValue = selected;
+        newDept = new Dept();   // initialize newDept whenever users click button Add so that it won't store previous contents
+    }
+
+    // read
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            url = "https://localhost:44309/api/DeptsApi";
+
+            // get web api
+            depts = await httpClient.GetStringAsync(url);
+            listDepts = JsonConvert.DeserializeObject<List<Dept>>(depts);   // 把json data deserialize為JObject
+        }
+        catch (Exception ex)
+        {
+            _ex = ex.ToString();
+        }
+    }
+
+    // create
+    private async Task AddNewDept()
+    {
+        try
+        {
+            if (newDept.deptid == 0)
+            {
+                errorMsg = "Invalid ID!";
+            }
+            else
+            {
+                url = "https://localhost:44309/api/DeptsApi";
+
+                string strUpdate = JsonConvert.SerializeObject(newDept);
+
+                HttpContent c = new StringContent(strUpdate, Encoding.UTF8, "application/json");
+                await httpClient.PostAsync(url, c);
+
+                await OnInitializedAsync(); // refresh data when created
+
+                selectValue = 0;    // conceal the pop up window
+                errorMsg = "";  // clear errorMsg's content
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.ToString()); // error message
+        }
+    }
+
+    // update
+    private void SetDeptForUpdate(Dept dept)
+    {
+        selectValue = 2;    // switch to update content
+        updateDept = dept;
+    }
+
+    private async Task UpdateDeptData()
+    {
+        try
+        {
+            url = "https://localhost:44309/api/DeptsApi/" + updateDept.deptid;
+
+            string strUpdate = JsonConvert.SerializeObject(updateDept);
+
+            HttpContent c = new StringContent(strUpdate, Encoding.UTF8, "application/json");
+            await httpClient.PutAsync(url, c);
+
+            await OnInitializedAsync(); // refresh data when updated
+
+            selectValue = 0;    // conceal the pop up window
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.ToString()); // error message
+        }
+    }
+
+    // delete
+    private async Task DeleteDept(Dept dept)
+    {
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "確定刪除" + dept.dname + "?"))
+        {
+            url = "https://localhost:44309/api/DeptsApi/" + dept.deptid;
+            await httpClient.DeleteAsync(url);
+
+            // refresh data when updated
+            await OnInitializedAsync();
+        }
     }
 }

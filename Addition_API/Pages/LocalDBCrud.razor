@@ -1,0 +1,170 @@
+﻿@page "/localDBCrud"
+
+@using Addition_API.Data
+@inject DeptService deptService
+@inject IJSRuntime JsRuntime;
+
+<h1>API CRUD</h1>
+
+@if (selectValue == 1)  // Add new dept
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @onclick=@(args => ChooseAction(0))>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <EditForm Model="@newDept">
+                    <div class="modal-body">
+                        <p class="alert-danger">@errorMsg</p>
+
+
+                        <label for="deptid">Department ID</label>
+                        <input type="number" id="deptid" class="form-control" @bind-value="@newDept.deptid" />
+
+                        <label for="dname">Department Name</label>
+                        <input type="text" id="dname" class="form-control" @bind-value="@newDept.dname" />
+
+                        <label for="location">Location</label>
+                        <input type="text" id="location" class="form-control" @bind-value="@newDept.location" />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-info" @onclick="AddNewDept">Add Department</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+else if (selectValue == 2) // Update dept
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" @onclick=@(args => ChooseAction(0))>
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <EditForm Model="@updateDept">
+                    <div class="modal-body">
+                        <label for="deptid">Department ID</label>
+                        <input type="number" id="deptid" class="form-control" @bind-value="@updateDept.deptid" disabled />
+
+                        <label for="dnme">Department Name</label>
+                        <input type="text" id="dname" class="form-control" @bind-value="@updateDept.dname" />
+
+                        <label for="location">Location</label>
+                        <input type="text" id="location" class="form-control" @bind-value="@updateDept.location" />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-info" @onclick="UpdateDeptData">Update Department</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+<a @onclick=@(args => ChooseAction(1))><RadzenIcon Icon="note_add" />Add</a>
+@*List all depts*@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Department Id</th>
+            <th>Department Name</th>
+            <th>Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (depts.Any())
+        {
+            @foreach (var dept in depts)
+            {
+                <tr>
+                    <td>@dept.deptid</td>
+                    <td>@dept.dname</td>
+                    <td>@dept.location</td>
+                    <td>
+                        <button class="btn btn-outline-danger" @onclick="(() => DeleteDept(dept))">Delete</button>
+                        <button class="btn btn-outline-primary" @onclick="(() => SetDeptForUpdate(dept))">Update</button>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td>No content.</td></tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private string errorMsg;
+    private List<Dept> depts = new List<Dept>();
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshDepts();
+    }
+
+    private async Task RefreshDepts()
+    {
+        depts = await deptService.GetDeptAsync();
+    }
+
+    // Add Dept
+    public Dept newDept { get; set; } = new Dept();
+    private async Task AddNewDept()
+    {
+        if (newDept.deptid == 0)
+        {
+            errorMsg = "Invalid ID!";
+        }
+        else
+        {
+            await deptService.AddDeptAsync(newDept);
+            newDept = new Dept();
+            await RefreshDepts();
+
+            errorMsg = "";  // clear error message when create action succeeded
+            selectValue = 0; // close create form when finishing create action
+        }
+    }
+
+    // Update Dept
+    Dept updateDept = new Dept();
+    private void SetDeptForUpdate(Dept dept)
+    {
+        selectValue = 2;    // switch to update content
+        updateDept = dept;
+    }
+
+    private async Task UpdateDeptData()
+    {
+        await deptService.UpdateDeptAsync(updateDept);
+        await RefreshDepts();
+
+        selectValue = 0; // close update form all when finishing update action
+    }
+
+    // Delete Dept
+    private async Task DeleteDept(Dept dept)
+    {
+        if(await JsRuntime.InvokeAsync<bool>("confirm", "確定刪除" + dept.dname + "?"))
+        {
+            await deptService.DeleteDeptAsync(dept);
+            await RefreshDepts();
+        }
+    }
+
+    private int selectValue;
+    private void ChooseAction(int selected)
+    {
+        selectValue = selected;
+    }
+}

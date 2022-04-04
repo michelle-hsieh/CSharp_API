@@ -1,17 +1,45 @@
 ﻿@inherits LayoutComponentBase
+@using Addition_API.DAO
+@using Addition_API.Pages
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar">
+                <NavMenu />
+            </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+            <div class="main">
+                <div class="top-row px-4">
+                    <button @onclick="(()=>doLogout())" class="btn btn-secondary">登出</button>
+                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                </div>
 
-        <div class="content px-4">
-            @Body
-        </div>
-    </div>
+                <div class="content px-4">
+                    @Body
+                </div>
+            </div>
+        </Authorized>
+
+        <NotAuthorized>
+            <LoginRedirect />
+            <div class="main">
+                <div class="content px-4">
+                    @Body
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>
+
+
+@code{
+
+    public void doLogout()
+    {
+        ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLogout();
+        NavigationManager.NavigateTo("/");
+    }
+}

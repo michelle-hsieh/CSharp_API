@@ -13,85 +13,106 @@ namespace Addition_API.Pages
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
 #nullable restore
-#line 1 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
-using System.Net.Http;
-
-#line default
-#line hidden
-#nullable disable
-#nullable restore
-#line 2 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 2 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Authorization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 3 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 3 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Authorization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 4 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 4 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Forms;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 5 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 5 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Routing;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 6 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 6 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Web;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 7 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 7 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 8 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 8 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Microsoft.JSInterop;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 9 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 9 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Addition_API;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 10 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 10 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\_Imports.razor"
 using Addition_API.Shared;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 13 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 3 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
+using System.Net.Http;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 4 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
+using Newtonsoft.Json;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 5 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
 using Radzen;
 
 #line default
 #line hidden
 #nullable disable
 #nullable restore
-#line 14 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\_Imports.razor"
+#line 6 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
 using Radzen.Blazor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 7 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
+using System.Text;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 8 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
+using Addition_API.Data;
 
 #line default
 #line hidden
@@ -105,18 +126,113 @@ using Radzen.Blazor;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 14 "C:\Documents\2021暑假\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
+#line 122 "C:\Documents\2021SummerVacation\VS2019\Addition_API\Addition_API\Pages\ApiCrud.razor"
        
+    private HttpClient httpClient = new HttpClient();
+    private string depts, url, errorMsg, _ex;
     private int selectValue;
+    private List<Dept> listDepts;
+    private Dept newDept { get; set; }
+    private Dept updateDept = new Dept();
 
     private void ChooseAction(int selected)
     {
         selectValue = selected;
+        newDept = new Dept();   // initialize newDept whenever users click button Add so that it won't store previous contents
+    }
+
+    // read
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            url = "https://localhost:44309/api/DeptsApi";
+
+            // get web api
+            depts = await httpClient.GetStringAsync(url);
+            listDepts = JsonConvert.DeserializeObject<List<Dept>>(depts);   // 把json data deserialize為JObject
+        }
+        catch (Exception ex)
+        {
+            _ex = ex.ToString();
+        }
+    }
+
+    // create
+    private async Task AddNewDept()
+    {
+        try
+        {
+            if (newDept.deptid == 0)
+            {
+                errorMsg = "Invalid ID!";
+            }
+            else
+            {
+                url = "https://localhost:44309/api/DeptsApi";
+
+                string strUpdate = JsonConvert.SerializeObject(newDept);
+
+                HttpContent c = new StringContent(strUpdate, Encoding.UTF8, "application/json");
+                await httpClient.PostAsync(url, c);
+
+                await OnInitializedAsync(); // refresh data when created
+
+                selectValue = 0;    // conceal the pop up window
+                errorMsg = "";  // clear errorMsg's content
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.ToString()); // error message
+        }
+    }
+
+    // update
+    private void SetDeptForUpdate(Dept dept)
+    {
+        selectValue = 2;    // switch to update content
+        updateDept = dept;
+    }
+
+    private async Task UpdateDeptData()
+    {
+        try
+        {
+            url = "https://localhost:44309/api/DeptsApi/" + updateDept.deptid;
+
+            string strUpdate = JsonConvert.SerializeObject(updateDept);
+
+            HttpContent c = new StringContent(strUpdate, Encoding.UTF8, "application/json");
+            await httpClient.PutAsync(url, c);
+
+            await OnInitializedAsync(); // refresh data when updated
+
+            selectValue = 0;    // conceal the pop up window
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.ToString()); // error message
+        }
+    }
+
+    // delete
+    private async Task DeleteDept(Dept dept)
+    {
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "確定刪除" + dept.dname + "?"))
+        {
+            url = "https://localhost:44309/api/DeptsApi/" + dept.deptid;
+            await httpClient.DeleteAsync(url);
+
+            // refresh data when updated
+            await OnInitializedAsync();
+        }
     }
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JsRuntime { get; set; }
     }
 }
 #pragma warning restore 1591
